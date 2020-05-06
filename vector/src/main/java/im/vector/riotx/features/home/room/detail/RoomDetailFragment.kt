@@ -16,6 +16,8 @@
 
 package im.vector.riotx.features.home.room.detail
 
+import GreetingsGenerator.GeneratedPhraseResult
+import GreetingsGenerator.Generator
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.content.DialogInterface
@@ -1408,7 +1410,14 @@ class RoomDetailFragment @Inject constructor(
             AttachmentTypeSelectorView.Type.AUDIO   -> attachmentsHelper.selectAudio(this)
             AttachmentTypeSelectorView.Type.CONTACT -> attachmentsHelper.selectContact(this)
             AttachmentTypeSelectorView.Type.STICKER -> vectorBaseActivity.notImplemented("Adding stickers")
+            AttachmentTypeSelectorView.Type.PUTSOBANANA -> this.handlePutsobanana()
         }.exhaustive
+    }
+
+    private fun handlePutsobanana(){
+        val generator : Generator = Generator()
+        val message: GeneratedPhraseResult = generator.compileMsg(generator.generate())
+        this.composerLayout.composerEditText.setText(message.getPhrase())
     }
 
     // AttachmentsHelper.Callback

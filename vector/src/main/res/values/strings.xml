@@ -1779,6 +1779,7 @@ Not all features in Riot are implemented in RiotX yet. Main missing (and coming 
     <string name="attachment_type_audio">"Audio"</string>
     <string name="attachment_type_gallery">"Gallery"</string>
     <string name="attachment_type_sticker">"Sticker"</string>
+    <string name="attachment_type_poutsobanana">"Poutsobanana"</string>
     <string name="error_handling_incoming_share">Couldn\'t handle share data</string>
 
     <string name="report_content_spam">"It's spam"</string>
