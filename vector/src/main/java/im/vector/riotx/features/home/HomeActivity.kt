@@ -259,10 +259,10 @@ class HomeActivity : VectorBaseActivity(), ToolbarConfigurable {
                 bugReporter.openBugReportScreen(this, true)
                 return true
             }
-            R.id.menu_home_report_bug -> {
+            /*R.id.menu_home_report_bug -> {
                 bugReporter.openBugReportScreen(this, false)
                 return true
-            }
+            }*/
             R.id.menu_home_filter     -> {
                 navigator.openRoomsFiltering(this)
                 return true
