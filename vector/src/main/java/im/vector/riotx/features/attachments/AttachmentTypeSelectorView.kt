@@ -71,6 +71,7 @@ class AttachmentTypeSelectorView(context: Context,
     private var stickersButton: ImageButton
     private var audioButton: ImageButton
     private var contactButton: ImageButton
+    private var putsobananaButton: ImageButton
 
     private var anchor: View? = null
 
@@ -83,6 +84,7 @@ class AttachmentTypeSelectorView(context: Context,
         stickersButton = layout.findViewById<ImageButton>(R.id.attachmentStickersButton).configure(Type.STICKER)
         audioButton = layout.findViewById<ImageButton>(R.id.attachmentAudioButton).configure(Type.AUDIO)
         contactButton = layout.findViewById<ImageButton>(R.id.attachmentContactButton).configure(Type.CONTACT)
+        putsobananaButton = layout.findViewById<ImageButton>(R.id.attachmentPutsobananaButton).configure(Type.PUTSOBANANA)
         contentView = root
         width = LinearLayout.LayoutParams.MATCH_PARENT
         height = LinearLayout.LayoutParams.WRAP_CONTENT
@@ -122,6 +124,7 @@ class AttachmentTypeSelectorView(context: Context,
             animateButtonIn(audioButton, ANIMATION_DURATION / 2)
             animateButtonIn(contactButton, ANIMATION_DURATION / 4)
             animateButtonIn(stickersButton, 0)
+            animateButtonIn(putsobananaButton, 2)
         }
     }
 
@@ -229,6 +232,7 @@ class AttachmentTypeSelectorView(context: Context,
         FILE(PERMISSIONS_FOR_WRITING_FILES),
         STICKER(PERMISSIONS_EMPTY),
         AUDIO(PERMISSIONS_FOR_WRITING_FILES),
-        CONTACT(PERMISSIONS_FOR_PICKING_CONTACT)
+        CONTACT(PERMISSIONS_FOR_PICKING_CONTACT),
+        PUTSOBANANA(PERMISSIONS_EMPTY),
     }
 }
