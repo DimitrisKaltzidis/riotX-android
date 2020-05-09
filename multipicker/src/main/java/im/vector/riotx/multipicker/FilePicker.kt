@@ -19,6 +19,7 @@ package im.vector.riotx.multipicker
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.provider.OpenableColumns
 import im.vector.riotx.multipicker.entity.MultiPickerFileType
 
@@ -69,5 +70,9 @@ class FilePicker(override val requestCode: Int) : Picker<MultiPickerFileType>(re
             putExtra(Intent.EXTRA_ALLOW_MULTIPLE, !single)
             type = "*/*"
         }
+    }
+
+    override fun getSelectedFile(context: Context, uri: String): List<MultiPickerFileType> {
+        TODO("Not yet implemented")
     }
 }

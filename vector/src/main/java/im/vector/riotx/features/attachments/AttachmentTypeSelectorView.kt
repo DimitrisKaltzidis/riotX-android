@@ -25,6 +25,7 @@ import android.os.Build
 import android.util.Pair
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.animation.Animation
@@ -42,6 +43,7 @@ import com.amulyakhare.textdrawable.util.ColorGenerator
 import im.vector.riotx.R
 import im.vector.riotx.core.extensions.getMeasurements
 import im.vector.riotx.core.utils.PERMISSIONS_EMPTY
+import im.vector.riotx.core.utils.PERMISSIONS_FOR_AUDIO_IP_CALL
 import im.vector.riotx.core.utils.PERMISSIONS_FOR_PICKING_CONTACT
 import im.vector.riotx.core.utils.PERMISSIONS_FOR_TAKING_PHOTO
 import im.vector.riotx.core.utils.PERMISSIONS_FOR_WRITING_FILES
@@ -61,6 +63,7 @@ class AttachmentTypeSelectorView(context: Context,
 
     interface Callback {
         fun onTypeSelected(type: Type)
+        fun onTypeReleased(type: Type)
     }
 
     private val iconColorGenerator = ColorGenerator.MATERIAL
@@ -211,8 +214,27 @@ class AttachmentTypeSelectorView(context: Context,
 
     private fun ImageButton.configure(type: Type): ImageButton {
         this.background = TextDrawable.builder().buildRound("", iconColorGenerator.getColor(type.ordinal))
-        this.setOnClickListener(TypeClickListener(type))
+        if(type != Type.AUDIO){
+            this.setOnClickListener(TypeClickListener(type))
+        }else{
+            this.setOnTouchListener(HoldReleaseListener(type))
+        }
         return this
+    }
+
+    private inner class HoldReleaseListener(private val type: Type): View.OnTouchListener{
+        override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+            when(event?.action) {
+                 MotionEvent.ACTION_DOWN->{
+                     callback?.onTypeSelected(type)
+                 }
+                 MotionEvent.ACTION_UP->{
+                     dismiss()
+                     callback?.onTypeReleased(type)
+                 }
+            }
+            return false
+        }
     }
 
     private inner class TypeClickListener(private val type: Type) : View.OnClickListener {
@@ -231,7 +253,7 @@ class AttachmentTypeSelectorView(context: Context,
         GALLERY(PERMISSIONS_FOR_WRITING_FILES),
         FILE(PERMISSIONS_FOR_WRITING_FILES),
         STICKER(PERMISSIONS_EMPTY),
-        AUDIO(PERMISSIONS_FOR_WRITING_FILES),
+        AUDIO(PERMISSIONS_FOR_AUDIO_IP_CALL),
         CONTACT(PERMISSIONS_FOR_PICKING_CONTACT),
         PUTSOBANANA(PERMISSIONS_EMPTY),
     }

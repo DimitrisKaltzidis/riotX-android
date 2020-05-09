@@ -20,8 +20,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.provider.MediaStore
 import im.vector.riotx.multipicker.entity.MultiPickerAudioType
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
 
 /**
  * Audio file picker implementation
@@ -89,5 +94,33 @@ class AudioPicker(override val requestCode: Int) : Picker<MultiPickerAudioType>(
             putExtra(Intent.EXTRA_ALLOW_MULTIPLE, !single)
             type = "audio/*"
         }
+    }
+
+    override fun getSelectedFile(context: Context, uri: String): List<MultiPickerAudioType> {
+        val audioList = mutableListOf<MultiPickerAudioType>()
+        val  fileName = uri.replace(context.externalCacheDir.toString()+"/","")
+        val f = File(context.externalCacheDir,fileName)
+        val uris: Uri = Uri.fromFile(f)
+        val mmr = MediaMetadataRetriever()
+        mmr.setDataSource(context, uris)
+        val durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+        val millSecond = durationStr.toLong()
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(millSecond)
+        val fileSize: Long = java.lang.String.valueOf(f.length() / 1024).toLong()
+
+      /*  val c: Calendar = Calendar.getInstance()
+        val df = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
+        val formattedDate: String = df.format(c.time)*/
+        audioList.add(
+                MultiPickerAudioType(
+                        "audio recording ($seconds sec)",
+                        fileSize,
+                        "audio/3gpp",
+                        uris,
+                        millSecond
+                )
+        )
+
+        return audioList;
     }
 }

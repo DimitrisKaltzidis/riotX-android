@@ -39,6 +39,8 @@ abstract class Picker<T>(open val requestCode: Int) {
      */
     abstract fun getSelectedFiles(context: Context, requestCode: Int, resultCode: Int, data: Intent?): List<T>
 
+    abstract fun getSelectedFile(context: Context, uri: String): List<T>
+
     /**
      * Use this function to retrieve files which are shared from another application or internally
      * by using android.intent.action.SEND or android.intent.action.SEND_MULTIPLE actions.

@@ -195,7 +195,7 @@ class MessageItemFactory @Inject constructor(
                 .iconRes(R.drawable.filetype_audio)
                 .clickListener(
                         DebouncedClickListener(View.OnClickListener {
-                            callback?.onAudioMessageClicked(messageContent)
+                            callback?.onAudioMessageClicked(informationData.eventId,messageContent)
                         }))
     }
 

@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.provider.ContactsContract
 import im.vector.riotx.multipicker.entity.MultiPickerContactType
 
@@ -131,5 +132,9 @@ class ContactPicker(override val requestCode: Int) : Picker<MultiPickerContactTy
             putExtra(Intent.EXTRA_ALLOW_MULTIPLE, !single)
             type = ContactsContract.Contacts.CONTENT_TYPE
         }
+    }
+
+    override fun getSelectedFile(context: Context, uri: String): List<MultiPickerContactType> {
+        TODO("Not yet implemented")
     }
 }

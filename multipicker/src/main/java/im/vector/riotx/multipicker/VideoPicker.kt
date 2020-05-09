@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.provider.MediaStore
 import im.vector.riotx.multipicker.entity.MultiPickerVideoType
 
@@ -98,5 +99,9 @@ class VideoPicker(override val requestCode: Int) : Picker<MultiPickerVideoType>(
             putExtra(Intent.EXTRA_ALLOW_MULTIPLE, !single)
             type = "video/*"
         }
+    }
+
+    override fun getSelectedFile(context: Context, uri: String): List<MultiPickerVideoType> {
+        TODO("Not yet implemented")
     }
 }

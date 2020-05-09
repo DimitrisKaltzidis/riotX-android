@@ -20,13 +20,17 @@ import GreetingsGenerator.GeneratedPhraseResult
 import GreetingsGenerator.Generator
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Typeface
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.text.Spannable
 import android.view.HapticFeedbackConstants
 import android.view.Menu
@@ -1063,7 +1067,9 @@ class RoomDetailFragment @Inject constructor(
                     val pendingType = attachmentsHelper.pendingType
                     if (pendingType != null) {
                         attachmentsHelper.pendingType = null
-                        launchAttachmentProcess(pendingType)
+                        if(pendingType != AttachmentTypeSelectorView.Type.AUDIO) {
+                            launchAttachmentProcess(pendingType)
+                        }
                     }
                 }
             }
@@ -1075,8 +1081,15 @@ class RoomDetailFragment @Inject constructor(
         }
     }
 
-    override fun onAudioMessageClicked(messageAudioContent: MessageAudioContent) {
-        vectorBaseActivity.notImplemented("open audio file")
+    override fun onAudioMessageClicked(eventId: String, messageAudioContent: MessageAudioContent) {
+        val action = RoomDetailAction.DownloadAudioFile(eventId, messageAudioContent)
+        // We need WRITE_EXTERNAL permission
+        if (checkPermissions(PERMISSIONS_FOR_WRITING_FILES, this, PERMISSION_REQUEST_CODE_DOWNLOAD_FILE)) {
+            showSnackWithMessage(getString(R.string.downloading_and_playing))
+            roomDetailViewModel.handle(action)
+        } else {
+            roomDetailViewModel.pendingAction = action
+        }
     }
 
     override fun onLoadMore(direction: Timeline.Direction) {
@@ -1392,11 +1405,21 @@ class RoomDetailFragment @Inject constructor(
         roomDetailViewModel.handle(RoomDetailAction.MarkAllAsRead)
     }
 
-    // AttachmentTypeSelectorView.Callback
+    // AttachmentTypeSelecitorView.Callback
 
     override fun onTypeSelected(type: AttachmentTypeSelectorView.Type) {
         if (checkPermissions(type.permissionsBit, this, PERMISSION_REQUEST_CODE_PICK_ATTACHMENT)) {
             launchAttachmentProcess(type)
+        } else {
+            attachmentsHelper.pendingType = type
+        }
+    }
+
+    override fun onTypeReleased(type: AttachmentTypeSelectorView.Type) {
+        if (checkPermissions(type.permissionsBit, this, PERMISSION_REQUEST_CODE_PICK_ATTACHMENT)) {
+          if( type == AttachmentTypeSelectorView.Type.AUDIO){
+              this.stopRecording()
+          }
         } else {
             attachmentsHelper.pendingType = type
         }
@@ -1407,12 +1430,47 @@ class RoomDetailFragment @Inject constructor(
             AttachmentTypeSelectorView.Type.CAMERA  -> attachmentsHelper.openCamera(this)
             AttachmentTypeSelectorView.Type.FILE    -> attachmentsHelper.selectFile(this)
             AttachmentTypeSelectorView.Type.GALLERY -> attachmentsHelper.selectGallery(this)
-            AttachmentTypeSelectorView.Type.AUDIO   -> attachmentsHelper.selectAudio(this)
+            AttachmentTypeSelectorView.Type.AUDIO   -> this.startRecording()
             AttachmentTypeSelectorView.Type.CONTACT -> attachmentsHelper.selectContact(this)
             AttachmentTypeSelectorView.Type.STICKER -> vectorBaseActivity.notImplemented("Adding stickers")
             AttachmentTypeSelectorView.Type.PUTSOBANANA -> this.handlePutsobanana()
         }.exhaustive
     }
+
+    private fun startRecording(){
+        //playSound()
+        vibrate()
+        AudioRecorder.startRecording(context);
+    }
+
+    private fun stopRecording() {
+        vibrate()
+       attachmentsHelper.selectRecordedAudio(AudioRecorder.stopRecording())
+    }
+
+    private fun vibrate(){
+        val v: Vibrator = context?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+        }
+    }
+
+    /*private fun playSound(){
+        var mp: MediaPlayer = MediaPlayer.create(context, R.raw.clearly)
+
+        try {
+            if (mp.isPlaying()) {
+                mp.stop()
+                mp.release()
+                mp = MediaPlayer.create(context, R.raw.clearly)
+            }
+            mp.start()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }*/
+
 
     private fun handlePutsobanana(){
         val generator : Generator = Generator()
