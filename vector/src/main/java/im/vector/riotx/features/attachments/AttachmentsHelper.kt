@@ -25,7 +25,9 @@ import im.vector.matrix.android.BuildConfig
 import im.vector.matrix.android.api.session.content.ContentAttachmentData
 import im.vector.riotx.core.platform.Restorable
 import im.vector.riotx.multipicker.MultiPicker
+import im.vector.riotx.multipicker.entity.MultiPickerAudioType
 import timber.log.Timber
+import java.io.File
 
 private const val CAPTURE_PATH_KEY = "CAPTURE_PATH_KEY"
 private const val PENDING_TYPE_KEY = "PENDING_TYPE_KEY"
@@ -88,6 +90,14 @@ class AttachmentsHelper(val context: Context, val callback: Callback) : Restorab
      */
     fun selectAudio(fragment: Fragment) {
         MultiPicker.get(MultiPicker.AUDIO).startWith(fragment)
+    }
+
+    fun selectRecordedAudio(recordingName: String){
+        val list: List<MultiPickerAudioType> = MultiPicker.get(MultiPicker.AUDIO).getSelectedFile(context, recordingName)
+
+        callback.onContentAttachmentsReady(
+               list.map { it.toContentAttachmentData() }
+        )
     }
 
     /**

@@ -19,6 +19,7 @@ package im.vector.riotx.multipicker
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.provider.MediaStore
 import im.vector.riotx.multipicker.entity.MultiPickerImageType
 import im.vector.riotx.multipicker.utils.ImageUtils
@@ -87,5 +88,9 @@ class ImagePicker(override val requestCode: Int) : Picker<MultiPickerImageType>(
             putExtra(Intent.EXTRA_ALLOW_MULTIPLE, !single)
             type = "image/*"
         }
+    }
+
+    override fun getSelectedFile(context: Context, uri: String): List<MultiPickerImageType> {
+        TODO("Not yet implemented")
     }
 }

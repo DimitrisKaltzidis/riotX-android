@@ -22,6 +22,7 @@ import com.airbnb.mvrx.FragmentViewModelContext
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.ViewModelContext
+import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.inject.assisted.Assisted
@@ -78,6 +79,7 @@ import org.commonmark.parser.Parser
 import org.commonmark.renderer.html.HtmlRenderer
 import timber.log.Timber
 import java.io.File
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -210,6 +212,7 @@ class RoomDetailViewModel @AssistedInject constructor(
             is RoomDetailAction.RequestVerification              -> handleRequestVerification(action)
             is RoomDetailAction.ResumeVerification               -> handleResumeRequestVerification(action)
             is RoomDetailAction.ReRequestKeys                    -> handleReRequestKeys(action)
+            is RoomDetailAction.DownloadAudioFile                -> handleDownloadAudioFile(action)
         }
     }
 
@@ -729,6 +732,40 @@ class RoomDetailViewModel @AssistedInject constructor(
         }
     }
 
+    private fun handleDownloadAudioFile(action: RoomDetailAction.DownloadAudioFile){
+       /* var  mimiType = "audio/3gpp";
+        if(action.messageFileContent.audioInfo?.mimeType != null){
+            mimiType = action.messageFileContent.audioInfo?.mimeType!!
+        }*/
+
+        session.downloadFile(
+                FileService.DownloadMode.TO_EXPORT,
+                action.eventId,
+                action.messageFileContent.body + UUID.randomUUID().toString(),
+                action.messageFileContent.getFileUrl(),
+                action.messageFileContent.encryptedFileInfo?.toElementToDecrypt(),
+
+                object : MatrixCallback<File> {
+                    override fun onSuccess(data: File) {
+
+                        AudioPlayer.playAudio(data)
+                        /*_viewEvents.post(RoomDetailViewEvents.DownloadFileState(
+                                action.messageFileContent.audioInfo?.mimeType!!,
+                                data,
+                                null
+                        ))*/
+                    }
+
+                    override fun onFailure(failure: Throwable) {
+                        _viewEvents.post(RoomDetailViewEvents.DownloadFileState(
+                                action.messageFileContent.audioInfo?.mimeType!!,
+                                null,
+                                failure
+                        ))
+                    }
+                })
+    }
+
     private fun handleDownloadFile(action: RoomDetailAction.DownloadFile) {
         session.downloadFile(
                 FileService.DownloadMode.TO_EXPORT,
@@ -754,6 +791,8 @@ class RoomDetailViewModel @AssistedInject constructor(
                     }
                 })
     }
+
+
 
     private fun handleNavigateToEvent(action: RoomDetailAction.NavigateToEvent) {
         stopTrackingUnreadMessages()
